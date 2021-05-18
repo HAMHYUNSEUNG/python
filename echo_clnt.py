@@ -1,6 +1,6 @@
 import socket
 
-HOST = '127.0.0.1'
+HOST = '10.0.0.32'
 PORT = 9090
 
 #소켓 객체 생성
