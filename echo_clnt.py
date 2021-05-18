@@ -11,7 +11,7 @@ clnt_sock.connect((HOST,PORT))
 
 print("채팅방에 입장했습니다! 서버에게 물어보세요!(나가기 : q)")
 
-while 1:
+while True:
     # 사용자에게 메시지 받기
     clnt_msg = input("\n나 : ")
     #메시지 전송
