@@ -1,4 +1,6 @@
 import socket
+import sys
+import select
 
 HOST = '127.0.0.1'
 PORT = 9090
@@ -28,20 +30,15 @@ print('접속 클라이언트 주소 : ', addr)
 
 # 클라이언트 메시지 수신대기
 while True:
-    data = clnt_sock.recv(1024)
+    read, write, fail = select.select((clnt_sock,sys.stdin),(),())
 
-    # 빈 문자면 종료
-    if not data:
-        break
-    elif data.decode() == 'q':
-        print("클라이언트 : ", addr, clnt_sock, "종료!")
-        continue
-    # 수신 받은 문자열 출력
-    print('\n클라이언트 : ', data.decode())
-
-    msg = input("나 : ")
-    # 받은문자 클라이언트에게 전송(에코)
-    clnt_sock.sendall(msg.encode())
+    for desc in read:
+        if desc == clnt_sock:
+            data = clnt_sock.recv(1024)
+            print('서버 메시지 : ', data.decode())
+        else:
+            clnt_msg = desc.readline()
+            clnt_sock.sendall(clnt_msg.encode())
 
 # 소켓닫기
 clnt_sock.close()
