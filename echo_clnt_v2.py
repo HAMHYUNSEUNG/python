@@ -1,6 +1,7 @@
+import msvcrt
 import socket
 import select
-
+import sys
 
 
 HOST = '127.0.0.1'
@@ -15,11 +16,26 @@ clnt_sock.connect((HOST,PORT))
 print("채팅방에 입장했습니다! 서버에게 물어보세요!(나가기 : q)")
 
 while True:
+
+    read, write, fail = select.select((clnt_sock,sys.stdin),(),())
+    if msvcrt.kbhit():
+        read.append(sys.stdin)
+
+    for desc in read:
+        if desc == clnt_sock:
+            data = clnt_sock.recv(1024)
+            print('서버 메시지 : ', data.decode())
+        else:
+            clnt_msg = desc.readline()
+            clnt_sock.sendall(clnt_msg.encode())
+
+    '''
     # 사용자에게 메시지 받기
     clnt_msg = input("\n나 : ")
     #메시지 전송
     if clnt_msg =='q':
         clnt_sock.sendall("q".encode())
+        print("채팅 종료! good bye~!")
         break
     clnt_sock.sendall(clnt_msg.encode())
 
@@ -27,7 +43,7 @@ while True:
     data = clnt_sock.recv(1024)
     #수신 메시지 출력
     print('서버 메시지 : ', data.decode())
-
+    '''
 
 #소켓 종료
 clnt_sock.close()
