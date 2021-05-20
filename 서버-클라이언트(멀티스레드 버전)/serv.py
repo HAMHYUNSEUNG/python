@@ -1,8 +1,26 @@
 import socket
 import threading
+import time
 
 HOST = '127.0.0.1'
 PORT = 9090
+
+def recv_msg(sock):
+    while True:
+        data = sock.recv(1024)
+        if not data:
+            break
+        elif data.decode() == 'q':
+            print("클라이언트 : ", addr, clnt_sock, "종료!")
+            clnt_sock.close()
+            serv_sock.close()
+        print("\n상대방 : ",data.decode())
+
+
+def send_msg(sock):
+    while True:
+        msg = input("\n나 : ")
+        sock.send(msg.encode())
 
 # 소켓 객체 생성 / IPv4, tcp 사용
 serv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,29 +38,16 @@ clnt_sock, addr = serv_sock.accept()
 print("클라이언트 접속!\n")
 print('접속 클라이언트 주소 : ', addr)
 
-def recv_msg():
-    print('test 1')
-    data = clnt_sock.recv(1024)
-    print(data)
 
 
-def send_msg():
-    print('test 2')
-    msg = input("나 : ")
-    clnt_sock.sendall(msg.encode())
+recv = threading.Thread(target=recv_msg, args=(clnt_sock,))
+send = threading.Thread(target=send_msg, args=(clnt_sock,))
+
+recv.start()
+send.start()
+
 # 클라이언트 메시지 수신대기
 while True:
+    time.sleep(1)
+    pass
 
-    reciev_msg = threading.Thread(target=recv_msg())
-    reciev_msg.start()
-
-    msg = input("나 : ")
-    clnt_sock.sendall(msg.encode())
-'''
-    send_msg = threading.Thread(target=send_msg())
-    send_msg.start()
-'''
-
-# 소켓닫기
-clnt_sock.close()
-serv_sock.close()
