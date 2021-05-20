@@ -14,8 +14,8 @@ clnt_sock.connect((HOST,PORT))
 print("채팅방에 입장했습니다! 서버에게 물어보세요!(나가기 : q)")
 
 while True:
-    read, write, fail = select.select((clnt_sock,sys.stdin),(),())
-
+    #read, write, fail = select.select((clnt_sock,sys.stdin),(),())
+    read, write, fail = select.select((clnt_sock,), (clnt_sock,), ())
     for desc in read:
         if desc == clnt_sock:
             data = clnt_sock.recv(1024)
@@ -23,7 +23,6 @@ while True:
         else:
             clnt_msg = desc.readline()
             clnt_sock.sendall(clnt_msg.encode())
-
 
 #소켓 종료
 clnt_sock.close()

@@ -1,6 +1,6 @@
 import socket
-import sys
-import select
+import multiprocessing as mp
+
 
 HOST = '127.0.0.1'
 PORT = 9090
@@ -21,17 +21,25 @@ clnt_sock, addr = serv_sock.accept()
 print("클라이언트 접속!\n")
 print('접속 클라이언트 주소 : ', addr)
 
+def recv_msg():
+    data = clnt_sock.recv(1024)
+    print(data)
+    print('test 1')
+
+def send_msg():
+    msg = input("나 : ")
+    clnt_sock.sendall(msg.encode())
+    print('test 2')
+
 # 클라이언트 메시지 수신대기
 while True:
-    read, write, fail = select.select((clnt_sock,sys.stdin),(),())
+    p = mp.Process(name="subprocess", target= recv_msg())
 
-    for desc in read:
-        if desc == clnt_sock:
-            data = clnt_sock.recv(1024)
-            print('서버 메시지 : ', data.decode())
-        else:
-            clnt_msg = desc.readline()
-            clnt_sock.sendall(clnt_msg.encode())
+    while True:
+        send_msg()
+        send_msg()
+
+
 
 # 소켓닫기
 clnt_sock.close()

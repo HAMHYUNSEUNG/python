@@ -1,6 +1,5 @@
 import socket
-import sys
-import select
+import threading
 
 HOST = '127.0.0.1'
 PORT = 9090
@@ -21,17 +20,28 @@ clnt_sock, addr = serv_sock.accept()
 print("클라이언트 접속!\n")
 print('접속 클라이언트 주소 : ', addr)
 
+def recv_msg():
+    print('test 1')
+    data = clnt_sock.recv(1024)
+    print(data)
+
+
+def send_msg():
+    print('test 2')
+    msg = input("나 : ")
+    clnt_sock.sendall(msg.encode())
 # 클라이언트 메시지 수신대기
 while True:
-    read, write, fail = select.select((clnt_sock,sys.stdin),(),())
 
-    for desc in read:
-        if desc == clnt_sock:
-            data = clnt_sock.recv(1024)
-            print('서버 메시지 : ', data.decode())
-        else:
-            clnt_msg = desc.readline()
-            clnt_sock.sendall(clnt_msg.encode())
+    reciev_msg = threading.Thread(target=recv_msg())
+    reciev_msg.start()
+
+    msg = input("나 : ")
+    clnt_sock.sendall(msg.encode())
+'''
+    send_msg = threading.Thread(target=send_msg())
+    send_msg.start()
+'''
 
 # 소켓닫기
 clnt_sock.close()
